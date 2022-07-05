@@ -3,6 +3,7 @@ from albums.serializers import AlbumSerializer
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
+from rest_framework.pagination import PageNumberPagination
 from songs.models import Song
 from songs.serializers import SongSerializer
 
@@ -25,6 +26,7 @@ class MusicianDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 class MusicianAlbumView(generics.ListCreateAPIView):
     serializer_class = AlbumSerializer
+    pagination_class = PageNumberPagination
 
     def get_queryset(self):
         musician = get_object_or_404(Musician, pk=self.kwargs["musician_id"])
