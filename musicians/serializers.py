@@ -1,15 +1,16 @@
+import albums
 from albums.serializers import AlbumSerializer
 from rest_framework import serializers
 
 from .models import Musician
 
 
-class MusicianSerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True)
-    first_name = serializers.CharField(max_length=255)
-    last_name = serializers.CharField(max_length=255)
-    instrument = serializers.CharField(max_length=255)
+class MusicianSerializer(serializers.ModelSerializer):
     albums = AlbumSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Musician
+        fields = ["id", "first_name", "last_name", "instrument", "albums"]
 
     def create(self, validated_data):
         return Musician.objects.create(**validated_data)
