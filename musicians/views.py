@@ -1,5 +1,6 @@
 from albums.models import Album
 from albums.serializers import AlbumSerializer
+from django.db.models import Sum
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
@@ -29,7 +30,48 @@ class MusicianAlbumView(generics.ListCreateAPIView):
     pagination_class = PageNumberPagination
 
     def get_queryset(self):
+        # import ipdb
+
+        # ipdb.set_trace()
         musician = get_object_or_404(Musician, pk=self.kwargs["musician_id"])
+
+        greater_than = self.request.GET.get("duration_gt")
+        lesser_than = self.request.GET.get("duration_lt")
+
+        if greater_than:
+            albums = Album.objects.filter(musician=musician)
+
+            filtered_albums = []
+
+            for album in albums:
+
+                if not album.songs.count():
+                    continue
+
+                if album.songs.aggregate(Sum("duration"))["duration__sum"] > int(
+                    greater_than
+                ):
+                    filtered_albums.append(album)
+
+            return filtered_albums
+
+        if lesser_than:
+            albums = Album.objects.filter(musician=musician)
+
+            filtered_albums = []
+
+            for album in albums:
+
+                if not album.songs.count():
+                    filtered_albums.append(album)
+                    continue
+
+                if album.songs.aggregate(Sum("duration"))["duration__sum"] < int(
+                    lesser_than
+                ):
+                    filtered_albums.append(album)
+
+            return filtered_albums
 
         return Album.objects.filter(musician=musician)
 

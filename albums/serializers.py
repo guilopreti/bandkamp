@@ -9,12 +9,16 @@ class AlbumSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Album
-        fields = ["id", "name", "musician_id", "total_duration", "songs"]
+        fields = ["id", "name", "musician_id", "total_duration", "songs_count", "songs"]
         read_only_fields = [
             "musician_id",
         ]
 
     total_duration = serializers.SerializerMethodField()
+    songs_count = serializers.SerializerMethodField()
+
+    def get_songs_count(self, album: Album):
+        return album.songs.count()
 
     def get_total_duration(self, album: Album):
         songs = album.songs.all()
