@@ -5,6 +5,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.views import Response, status
 from songs.models import Song
 from songs.serializers import SongSerializer
 
@@ -98,31 +99,12 @@ class MusicianAlbumSongView(generics.ListCreateAPIView):
         ).first()
 
         if not album:
-            raise Http404("Album not Found")
+            raise Http404("Album not found")
 
         serializer.save(album=album)
 
-
-# class MusicianAlbumSongView(APIView):
-#     def get(self, request, musician_id, album_id):
-#         musician = get_object_by_id(Musician, musician_id)
-#         album = get_object_by_id(Album, album_id)
-#         songs = Song.objects.filter(album=album)
-
-#         serializer = SongSerializer(songs, many=True)
-
-#         return Response(serializer.data)
-
-#     def post(self, request, musician_id, album_id):
-#         musician = get_object_by_id(Musician, musician_id)
-
-#         album = Album.objects.filter(musician=musician, id=album_id).first()
-
-#         if not album:
-#             return Response({"detail": "Album not Found"}, status.HTTP_404_NOT_FOUND)
-
-#         serializer = SongSerializer(data=request.data)
-#         serializer.is_valid(raise_exception=True)
-#         serializer.save(album=album)
-
-#         return Response(serializer.data, status.HTTP_201_CREATED)
+    def post(self, request, *args, **kwargs):
+        try:
+            return super().post(request, *args, **kwargs)
+        except Http404 as ht:
+            return Response({"detail": ht.__str__()}, status=status.HTTP_404_NOT_FOUND)
