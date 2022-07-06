@@ -26,9 +26,6 @@ class AlbumSerializer(serializers.ModelSerializer):
         for song in songs:
             total_duration += song.duration
 
-        # outra forma:
-        # from django.db.models import Sum
-        # album.songs.aggregate(Sum('duration'))
         return total_duration
 
     def create(self, validated_data):

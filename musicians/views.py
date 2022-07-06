@@ -31,9 +31,6 @@ class MusicianAlbumView(generics.ListCreateAPIView):
     pagination_class = PageNumberPagination
 
     def get_queryset(self):
-        # import ipdb
-
-        # ipdb.set_trace()
         musician = get_object_or_404(Musician, pk=self.kwargs["musician_id"])
 
         greater_than = self.request.GET.get("duration_gt")
